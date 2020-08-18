@@ -1,0 +1,2 @@
+package *
+            ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wpartial-fields -Wredundant-constraints
