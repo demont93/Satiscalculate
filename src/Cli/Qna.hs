@@ -15,8 +15,6 @@ module Cli.Qna
 import           Control.Monad.IO.Class
 import qualified Data.Text as Text
 
-
-
 newtype QnA b = QnA { getQnA :: IO (UserInput b) }
 
 
@@ -77,3 +75,4 @@ getQuestions :: QnA a -> IO [UserInteraction]
 getQuestions qna = do
   (UserInput qs _) <- getQnA qna
   return qs
+

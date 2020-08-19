@@ -1,58 +1,82 @@
-module Db
-  ( Db
-  , recipeFromKey
-  , insertRecipe
-  -- , writeDb
-  -- , loadDb
+module Db (
+  Db,
+  recipeFromKey,
+  insertRecipe,
+  writeDb,
+  loadDb
   ) where
 
+import Control.Applicative ((<|>))
 import           Data.Aeson
 import qualified Data.HashMap.Strict as Map
 import qualified Data.Text as Text
 import qualified Data.Vector as V
+import           GHC.Generics
 import           Recipe
 
-newtype Db = Db (Map.HashMap Text.Text Table)
-           deriving Show
+newtype Db
+  = Db (Map.HashMap Text.Text Table)
+  deriving (Show, Generic)
+  deriving anyclass (ToJSON, FromJSON)
 
-newtype Table = Table (Map.HashMap Text.Text Record)
-              deriving Show
+data Table
+  = FactoryTable (Map.HashMap Text.Text Factory)
+  | RecipeTable (Map.HashMap Text.Text Recipe)
+  deriving (Show, Generic)
 
-data Record
-  = RecipeRecord Recipe
-  | FactoryRecord Factory
-  deriving Show
+-- TODO Refactor: code duplication
+instance FromJSON Table where
+  parseJSON = withArray "TableValues" $ \v ->
+    (RecipeTable <$> V.foldM c Map.empty v)
+    <|>
+    (FactoryTable <$> V.foldM c' Map.empty v)
+    where c k x = do
+            r <- parseJSON x
+            return $ Map.insert (Recipe.name r) r k
+          c' k x = do
+            f <- parseJSON x
+            return $ Map.insert (Db.name f) f k
 
-data Factory = Factory Int Double
-             deriving Show
+-- TODO Refactor: code duplication
+instance ToJSON Table where
+  toJSON (FactoryTable m) =
+    toJSON $! V.fromList $ snd <$> Map.toList m
+  toJSON (RecipeTable m)  =
+    toJSON $! V.fromList $ snd <$> Map.toList m
 
-instance ToJSON Db where
-  toJSON (Db db) = object ["recipes" .= recipes]
-    where recipes = V.fromList $ Map.foldr (\v acc -> toJSON v : acc) [] db
+data Factory
+  = Factory
+  { name :: Text.Text
+  , factoryDimensions :: Dimensions
+  , materialsRequired :: Map.HashMap Text.Text Text.Text
+  , inputs            :: Int
+  , outputs           :: Int }
+  deriving (Show, Generic, FromJSON, ToJSON)
 
--- instance FromJSON Db where
---   parseJSON = withObject "recipe list" $ \v -> do
---     vec_ <- v .: "recipes"
---     return $ Db $
---       V.foldl'
---       (\acc cur@(Recipe name_ _ _ _ _) -> Map.insert name_ cur acc)
---       Map.empty
---       vec_
+data Dimensions
+  = Dimensions
+  { width  :: Double
+  , length :: Double
+  , height :: Double
+  }
+  deriving (Show, ToJSON, FromJSON, Generic)
 
-recipeFromKey :: Db -> Text.Text -> Maybe Recipe
-recipeFromKey (Db db) n =
-  Map.lookup "recipe" db >>=
-  \(Table x) -> (Map.lookup n x) >>=
-  \(RecipeRecord r) -> return r
+getTable :: Text.Text -> Db -> Maybe Table
+getTable t (Db db) = Map.lookup t db
+
+recipeFromKey :: Text.Text -> Db -> Maybe Recipe
+recipeFromKey t (getTable "recipes" -> Just (RecipeTable m)) = Map.lookup t m
+recipeFromKey _ _ = Nothing
 
 insertRecipe :: Text.Text -> Recipe -> Db -> Db
-insertRecipe k v (Db db) = Db $!
-  Map.alter c "recipe" db
-  where c (Just (Table old)) = Just $ Table $! Map.insert k (RecipeRecord v) old
-        c Nothing            = Just $ Table $! Map.singleton k (RecipeRecord v)
+insertRecipe k newRecipe (Db db) = Db $
+  Map.alter c "recipes" db
+  where c (Just (RecipeTable rt)) = Just $ RecipeTable $ Map.insert k newRecipe rt
+        c Nothing                 = Just $ RecipeTable $ Map.singleton k newRecipe
+        c (Just _)                = error "Something went terribly wrong."
 
--- writeDb :: Db -> IO ()
--- writeDb = encodeFile "db/Recipes.json"
+writeDb :: Db -> IO ()
+writeDb = encodeFile "db/db.json"
 
--- loadDb :: String -> IO (Either String Db)
--- loadDb = eitherDecodeFileStrict
+loadDb :: String -> IO (Either String Db)
+loadDb = eitherDecodeFileStrict

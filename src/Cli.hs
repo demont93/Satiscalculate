@@ -1,8 +1,8 @@
 module Cli (
   askData,
   confirmInput,
-  genRecipe,
-  genRecipeWithName
+  PromptUser(..),
+  runQna
   ) where
 
 import           Cli.Qna
@@ -15,6 +15,7 @@ import qualified Data.HashMap.Strict       as Map
 import qualified Data.Text                 as Text
 import qualified Data.Text.IO              as Text.IO
 import           Recipe
+import Control.Applicative
 
 askData :: ValidInput b => Text.Text -> Text.Text -> MaybeT QnA b
 askData q n = do
@@ -27,33 +28,39 @@ askData q n = do
 confirmInput :: QnA a -> MaybeT QnA a
 confirmInput r = do
   ui <- lift $! listenInput r
-  MaybeT $ liftIO $ do
+  liftIO $ do
     Text.IO.putStrLn $ formatHistory $ vna ui
     yn <- askYesOrNo "Is this correct? (y/n)"
     case yn of
-      No  -> return Nothing
-      Yes -> return $! Just $ value ui
+      No  -> empty
+      Yes -> return $! value ui
+
+runQna :: QnA a -> MaybeT IO a
+runQna qna = MaybeT $ getAnswers $ runMaybeT $ confirmInput qna
 
 formatHistory :: [UserInteraction] -> Text.Text
 formatHistory = foldr c ""
   where c (UserInteraction name answer) acc =
           name <> ":  " <> answer <> "\n" <> acc
 
-genRecipe :: MaybeT QnA Recipe
-genRecipe = askData "Enter exact item name" "Name" >>= genRecipeWithName
+class PromptUser a where
+  promptData :: MaybeT QnA a
+  promptNamedData :: Text.Text -> MaybeT QnA a
 
-genRecipeWithName :: Text.Text -> MaybeT QnA Recipe
-genRecipeWithName name' = do
-  opm' <- askData "Enter recipe output per minute" "Output per minute"
-  craftingSeconds' <- askData "Enter recipe crafting time in seconds" "Crafting seconds"
-  factoryName' <- askData "Enter factory used to build this item" "Factory name"
-  materialsNeeded' <- getMaterialsNeeded Map.empty
-  return Recipe { name = name'
-                , opm  = opm'
-                , craftingSeconds = craftingSeconds'
-                , materialsNeeded = materialsNeeded'
-                , factoryName     = factoryName'
-                }
+instance PromptUser Recipe where
+  promptData = askData "Enter exact item name" "Name" >>= promptNamedData
+
+  promptNamedData name' = do
+    opm' <- askData "Enter recipe output per minute" "Output per minute"
+    craftingSeconds' <- askData "Enter recipe crafting time in seconds" "Crafting seconds"
+    factoryName' <- askData "Enter factory used to build this item" "Factory name"
+    materialsNeeded' <- getMaterialsNeeded Map.empty
+    return Recipe { name = name'
+                  , opm  = opm'
+                  , craftingSeconds = craftingSeconds'
+                  , materialsNeeded = materialsNeeded'
+                  , factoryName     = factoryName'
+                  }
 
 getMaterialsNeeded :: Map.HashMap Text.Text Double -> MaybeT QnA (Map.HashMap Text.Text Double)
 getMaterialsNeeded m = do

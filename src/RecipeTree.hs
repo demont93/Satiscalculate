@@ -29,7 +29,7 @@ type RecipeTree = Tree.Tree RecipeLabel
 
 fromDb :: Db -> Text.Text -> Maybe RecipeTree
 fromDb db n = do
-  r <- recipeFromKey db n
+  r <- recipeFromKey n db
   return $ fromDb' db r (opm r)
 
 fromDb' :: Db -> Recipe -> Double -> RecipeTree
@@ -37,7 +37,7 @@ fromDb' db r !n = Tree.Node (RecipeLabel r n) forest
   where
     forest = Map.foldMapWithKey worker mats
     worker :: Text.Text -> Double -> [RecipeTree]
-    worker k v = case recipeFromKey db k of
+    worker k v = case recipeFromKey k db of
       Just x  -> return $! fromDb' db x (n / opm r * v)
       Nothing -> return $ Tree.Node (MaterialLabel k (n / opm r * v)) []
     mats = materialsNeeded r

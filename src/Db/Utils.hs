@@ -1,7 +1,7 @@
 module Db.Utils (
-  addManyRecipesToDbWithUserInput
+  addManyRecipesToDbWithUserInput,
+  addManyFactoriesTodbWithUserInput
   ) where
-
 
 import           Cli
 import           Cli.Qna
@@ -17,9 +17,17 @@ import qualified Data.Text.IO as Text.IO
 import           Db
 import           Recipe
 
-
+-- TODO not working, exposes duplication of behavior
 addManyFactoriesTodbWithUserInput :: Db -> IO Db
-addManyFactoriesTodbWithUserInput = undefined
+addManyFactoriesTodbWithUserInput db2 = do
+  maybeNewDb2 <- runMaybeT $! addRecipeToDb db2
+  case maybeNewDb2 of
+    Nothing     -> return db2
+    Just newDb2 -> do
+      yn <- askYesOrNo "Add another recipe? (y/n)"
+      case yn of
+        Yes -> addManyRecipesToDbWithUserInput newDb2
+        No  -> return db2
 
 addManyRecipesToDbWithUserInput :: Db -> IO Db
 addManyRecipesToDbWithUserInput db2 = do
@@ -32,7 +40,6 @@ addManyRecipesToDbWithUserInput db2 = do
         Yes -> addManyRecipesToDbWithUserInput newDb2
         No  -> return db2
 
-
 addRecipeToDb :: Db -> MaybeT IO Db
 addRecipeToDb db = do
   recipe <- newRecipe
@@ -40,7 +47,6 @@ addRecipeToDb db = do
   liftIO $ do
     writeDb newDb
     addMissingMaterialsToDb newDb (materialsNeeded recipe)
-
 
 addRecipeWithNameToDb :: Db -> Text.Text -> MaybeT IO Db
 addRecipeWithNameToDb db name' = do
@@ -50,7 +56,6 @@ addRecipeWithNameToDb db name' = do
     writeDb newDb
     addMissingMaterialsToDb newDb (materialsNeeded recipe)
 
-
 addMissingMaterialsToDb :: Db -> Map.HashMap Text.Text Double -> IO Db
 addMissingMaterialsToDb initialDb = Map.foldlWithKey' c $ return initialDb
   where
@@ -58,13 +63,12 @@ addMissingMaterialsToDb initialDb = Map.foldlWithKey' c $ return initialDb
     c db materialName _ = do
           db' <- db
           res <- runMaybeT $ do
-            itemToAdd <- MaybeT $ return $! case recipeFromKey db' materialName of
+            itemToAdd <- MaybeT $ return $! case recipeFromKey materialName db' of
               Nothing           -> Just materialName
               Just _alreadyInDb -> Nothing
             liftIO $ Text.IO.putStrLn $ "Adding Recipe: " <> itemToAdd
             addMaterialToDb db' itemToAdd
           return $! fromMaybe db' res
-
 
 addMaterialToDb :: Db -> Text.Text -> MaybeT IO Db
 addMaterialToDb db name' = do
@@ -74,14 +78,10 @@ addMaterialToDb db name' = do
     Yes -> empty
     No  -> addRecipeWithNameToDb db name'
 
-
-
-
-newRecipe :: MaybeT IO Recipe
-newRecipe = MaybeT $ join
-  <$> getAnswers (runMaybeT $ confirmInput $ runMaybeT genRecipe)
-
+newRecipe :: MaybeT IO a
+newRecipe = undefined
+  -- getAnswers (runMaybeT $ confirmInput $ runMaybeT promptData)
 
 newRecipeWithName :: Text.Text -> MaybeT IO Recipe
 newRecipeWithName name = MaybeT $ join
-  <$> getAnswers (runMaybeT $ confirmInput $ runMaybeT $ genRecipeWithName name)
+  <$> getAnswers (runMaybeT $ confirmInput $ runMaybeT $ promptNamedData name)
