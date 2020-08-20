@@ -5,74 +5,71 @@ module Cli.Qna
   , getQuestions
   , recordInput
   , listenInput
-  , UserInput
+  , ResultWithInputHistory
   , vna
   , value
-  , UserInteraction(..)
+  , UserInputRecording(..)
   ) where
-
 
 import           Control.Monad.IO.Class
 import qualified Data.Text as Text
 
-newtype QnA b = QnA { getQnA :: IO (UserInput b) }
+newtype QnA b = QnA { getQnA :: IO (ResultWithInputHistory b) }
 
+type InputHistory = [UserInputRecording]
 
-data UserInput a = UserInput { vna   :: [UserInteraction]
-                             , value :: a
-                             } deriving (Show)
+data ResultWithInputHistory a
+  = ResultWithInputHistory
+  { vna   :: InputHistory
+  , value :: a
+  }
+  deriving (Show)
 
-
-data UserInteraction = UserInteraction { valName :: Text.Text
-                                       , answer  :: Text.Text
-                                       } deriving (Show)
-
+data UserInputRecording
+  = UserInputRecording
+  { valName :: Text.Text
+  , answer  :: Text.Text
+  }
+  deriving (Show)
 
 instance MonadIO QnA where
-  liftIO a = QnA $ UserInput [] <$> a
-
+  liftIO a = QnA $ ResultWithInputHistory [] <$> a
 
 instance Functor QnA where
   fmap f r = QnA $ do
-    (UserInput qa v) <- getQnA r
-    return $ UserInput qa (f v)
-
+    (ResultWithInputHistory qa v) <- getQnA r
+    return $ ResultWithInputHistory qa (f v)
 
 instance Applicative QnA where
   f <*> r = QnA $ do
-    (UserInput qa f')  <- getQnA f
-    (UserInput qa' v') <- getQnA r
-    return $ UserInput (qa <> qa') $ f' v'
+    (ResultWithInputHistory qa f')  <- getQnA f
+    (ResultWithInputHistory qa' v') <- getQnA r
+    return $ ResultWithInputHistory (qa <> qa') $ f' v'
 
-  pure v = QnA $ return $ UserInput [] v
+  pure v = QnA $ return $ ResultWithInputHistory [] v
 
 
 instance Monad QnA where
   r >>= f = QnA $ do
-    (UserInput qa v) <- getQnA r
-    (UserInput qa' v') <- getQnA $ f v
-    return $ UserInput (qa <> qa') v'
+    (ResultWithInputHistory qa v) <- getQnA r
+    (ResultWithInputHistory qa' v') <- getQnA $ f v
+    return $ ResultWithInputHistory (qa <> qa') v'
   return = pure
 
+recordInput :: UserInputRecording -> QnA ()
+recordInput i = QnA $ return $ ResultWithInputHistory [i] ()
 
-recordInput :: UserInteraction -> QnA ()
-recordInput i = QnA $ return $ UserInput [i] ()
-
-
-listenInput :: QnA a -> QnA (UserInput a)
+listenInput :: QnA a -> QnA (ResultWithInputHistory a)
 listenInput m = do
   ui <- liftIO $ getQnA m
   QnA $! return ui{ value = ui }
 
-
 getAnswers :: QnA a -> IO a
 getAnswers qna = do
-  (UserInput _ as) <- getQnA qna
+  (ResultWithInputHistory _ as) <- getQnA qna
   return as
 
-
-getQuestions :: QnA a -> IO [UserInteraction]
+getQuestions :: QnA a -> IO [UserInputRecording]
 getQuestions qna = do
-  (UserInput qs _) <- getQnA qna
+  (ResultWithInputHistory qs _) <- getQnA qna
   return qs
-

@@ -24,6 +24,7 @@ executable satiscalculate
                      , Cli.Qna
                      , Cli.ValidInput
                      , Cli.Parser
+                     , Factory
                      , Recipe
                      , RecipeTree
                      , Db

@@ -1,11 +1,11 @@
 module Db (
   Db,
-  recipeFromKey,
-  insertRecipe,
+  DbStorable(..),
   writeDb,
-  loadDb
+  loadDb,
   ) where
 
+import qualified Factory as F
 import Control.Applicative ((<|>))
 import           Data.Aeson
 import qualified Data.HashMap.Strict as Map
@@ -20,7 +20,7 @@ newtype Db
   deriving anyclass (ToJSON, FromJSON)
 
 data Table
-  = FactoryTable (Map.HashMap Text.Text Factory)
+  = FactoryTable (Map.HashMap Text.Text F.Factory)
   | RecipeTable (Map.HashMap Text.Text Recipe)
   deriving (Show, Generic)
 
@@ -35,7 +35,7 @@ instance FromJSON Table where
             return $ Map.insert (Recipe.name r) r k
           c' k x = do
             f <- parseJSON x
-            return $ Map.insert (Db.name f) f k
+            return $ Map.insert (F.name f) f k
 
 -- TODO Refactor: code duplication
 instance ToJSON Table where
@@ -44,22 +44,24 @@ instance ToJSON Table where
   toJSON (RecipeTable m)  =
     toJSON $! V.fromList $ snd <$> Map.toList m
 
-data Factory
-  = Factory
-  { name :: Text.Text
-  , factoryDimensions :: Dimensions
-  , materialsRequired :: Map.HashMap Text.Text Text.Text
-  , inputs            :: Int
-  , outputs           :: Int }
-  deriving (Show, Generic, FromJSON, ToJSON)
+class DbStorable e where
+  dbInsert :: Text.Text -> e -> Db -> Db
+  dbLookup :: Text.Text -> Db -> Maybe e
 
-data Dimensions
-  = Dimensions
-  { width  :: Double
-  , length :: Double
-  , height :: Double
-  }
-  deriving (Show, ToJSON, FromJSON, Generic)
+instance DbStorable Recipe where
+  dbInsert = insertRecipe
+  dbLookup = recipeFromKey
+
+instance DbStorable F.Factory where
+  dbLookup t (getTable "factories" -> Just (FactoryTable m)) = Map.lookup t m
+  dbLookup _ _ = Nothing
+
+  dbInsert k newFactory (Db db) = Db $
+    Map.alter c "factories" db
+    where c (Just (FactoryTable rt)) = Just $ FactoryTable $ Map.insert k newFactory rt
+          c Nothing                  = Just $ FactoryTable $ Map.singleton k newFactory
+          c (Just _)                 = error "Something went terribly wrong."
+
 
 getTable :: Text.Text -> Db -> Maybe Table
 getTable t (Db db) = Map.lookup t db

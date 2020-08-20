@@ -4,10 +4,8 @@ module Db.Utils (
   ) where
 
 import           Cli
-import           Cli.Qna
 import           Cli.YesNo
 import           Control.Applicative
-import           Control.Monad
 import           Control.Monad.IO.Class
 import           Control.Monad.Trans.Maybe
 import qualified Data.HashMap.Strict as Map
@@ -15,19 +13,20 @@ import           Data.Maybe (fromMaybe)
 import qualified Data.Text as Text
 import qualified Data.Text.IO as Text.IO
 import           Db
+import qualified Factory as F
 import           Recipe
 
--- TODO not working, exposes duplication of behavior
+-- TODO remove duplication
 addManyFactoriesTodbWithUserInput :: Db -> IO Db
-addManyFactoriesTodbWithUserInput db2 = do
-  maybeNewDb2 <- runMaybeT $! addRecipeToDb db2
-  case maybeNewDb2 of
-    Nothing     -> return db2
-    Just newDb2 -> do
-      yn <- askYesOrNo "Add another recipe? (y/n)"
+addManyFactoriesTodbWithUserInput db = do
+  maybeNewDb <- runMaybeT $! addFactoryToDb db
+  case maybeNewDb of
+    Nothing     -> return db
+    Just newDb -> do
+      yn <- askYesOrNo "Add another factory? (y/n)"
       case yn of
-        Yes -> addManyRecipesToDbWithUserInput newDb2
-        No  -> return db2
+        Yes -> addManyFactoriesTodbWithUserInput newDb
+        No  -> return db
 
 addManyRecipesToDbWithUserInput :: Db -> IO Db
 addManyRecipesToDbWithUserInput db2 = do
@@ -40,18 +39,26 @@ addManyRecipesToDbWithUserInput db2 = do
         Yes -> addManyRecipesToDbWithUserInput newDb2
         No  -> return db2
 
+addFactoryToDb :: Db -> MaybeT IO Db
+addFactoryToDb db = do
+  factory <- new
+  let newDb = dbInsert (F.name factory) factory db
+  liftIO $ writeDb newDb
+  return newDb
+
+
 addRecipeToDb :: Db -> MaybeT IO Db
 addRecipeToDb db = do
-  recipe <- newRecipe
-  let newDb = insertRecipe (name recipe) recipe db
+  recipe <- new
+  let newDb = dbInsert (name recipe) recipe db
   liftIO $ do
     writeDb newDb
     addMissingMaterialsToDb newDb (materialsNeeded recipe)
 
 addRecipeWithNameToDb :: Db -> Text.Text -> MaybeT IO Db
 addRecipeWithNameToDb db name' = do
-  recipe <- newRecipeWithName name'
-  let newDb = insertRecipe (name recipe) recipe db
+  recipe <- newNamed name'
+  let newDb = dbInsert (name recipe) recipe db
   liftIO $ do
     writeDb newDb
     addMissingMaterialsToDb newDb (materialsNeeded recipe)
@@ -63,9 +70,10 @@ addMissingMaterialsToDb initialDb = Map.foldlWithKey' c $ return initialDb
     c db materialName _ = do
           db' <- db
           res <- runMaybeT $ do
-            itemToAdd <- MaybeT $ return $! case recipeFromKey materialName db' of
-              Nothing           -> Just materialName
-              Just _alreadyInDb -> Nothing
+            itemToAdd <- MaybeT $ return $!
+              case (dbLookup materialName db' :: Maybe Recipe) of
+                Nothing           -> Just materialName
+                Just _alreadyInDb -> Nothing
             liftIO $ Text.IO.putStrLn $ "Adding Recipe: " <> itemToAdd
             addMaterialToDb db' itemToAdd
           return $! fromMaybe db' res
@@ -77,11 +85,3 @@ addMaterialToDb db name' = do
   case yn of
     Yes -> empty
     No  -> addRecipeWithNameToDb db name'
-
-newRecipe :: MaybeT IO a
-newRecipe = undefined
-  -- getAnswers (runMaybeT $ confirmInput $ runMaybeT promptData)
-
-newRecipeWithName :: Text.Text -> MaybeT IO Recipe
-newRecipeWithName name = MaybeT $ join
-  <$> getAnswers (runMaybeT $ confirmInput $ runMaybeT $ promptNamedData name)

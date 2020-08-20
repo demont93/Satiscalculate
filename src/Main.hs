@@ -43,7 +43,11 @@ app = do
 ------------------------------------------------------------------------------
 
 getCommand :: Params -> Db -> App ()
-getCommand (Command "db" _) db   = void $ liftIO $ addManyRecipesToDbWithUserInput db
+getCommand (Command "db" args) db =
+  case decodeUtf8 $ args ! 0 of
+    "factories" -> void $ liftIO $ addManyFactoriesTodbWithUserInput db
+    "recipes"   -> void $ liftIO $ addManyRecipesToDbWithUserInput db
+    _           -> liftIO $ putStrLn "No db selected"
 getCommand (Command "raw" args) db =
   liftIO $ Text.IO.putStrLn $ case fromDb db item of
                Just x ->
