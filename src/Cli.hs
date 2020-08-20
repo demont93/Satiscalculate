@@ -96,7 +96,6 @@ instance PromptUser F.MaterialsNeeded where
               No  -> return newMap
               Yes -> go newMap
 
-
 new :: PromptUser a => MaybeT IO a
 new = do
   t <- runQnA $ runMaybeT promptData

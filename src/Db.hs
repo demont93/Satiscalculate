@@ -19,16 +19,15 @@ newtype Db
   deriving (Show, Generic)
   deriving anyclass (ToJSON, FromJSON)
 
-data Table
-  = FactoryTable (Map.HashMap Text.Text F.Factory)
-  | RecipeTable (Map.HashMap Text.Text Recipe)
+data Table where
+  FactoryTable :: Map.HashMap Text.Text F.Factory -> Table
+  RecipeTable  :: Map.HashMap Text.Text Recipe -> Table
   deriving (Show, Generic)
 
 -- TODO Refactor: code duplication
 instance FromJSON Table where
   parseJSON = withArray "TableValues" $ \v ->
-    (RecipeTable <$> V.foldM c Map.empty v)
-    <|>
+    (RecipeTable <$> V.foldM c Map.empty v) <|>
     (FactoryTable <$> V.foldM c' Map.empty v)
     where c k x = do
             r <- parseJSON x
@@ -49,8 +48,14 @@ class DbStorable e where
   dbLookup :: Text.Text -> Db -> Maybe e
 
 instance DbStorable Recipe where
-  dbInsert = insertRecipe
-  dbLookup = recipeFromKey
+  dbInsert k newRecipe (Db db) = Db $
+    Map.alter c "recipes" db
+    where c (Just (RecipeTable rt)) = Just $ RecipeTable $ Map.insert k newRecipe rt
+          c Nothing                 = Just $ RecipeTable $ Map.singleton k newRecipe
+          c (Just _)                = error "Something went terribly wrong."
+
+  dbLookup t (getTable "recipes" -> Just (RecipeTable m)) = Map.lookup t m
+  dbLookup _ _ = Nothing
 
 instance DbStorable F.Factory where
   dbLookup t (getTable "factories" -> Just (FactoryTable m)) = Map.lookup t m
@@ -62,20 +67,8 @@ instance DbStorable F.Factory where
           c Nothing                  = Just $ FactoryTable $ Map.singleton k newFactory
           c (Just _)                 = error "Something went terribly wrong."
 
-
 getTable :: Text.Text -> Db -> Maybe Table
 getTable t (Db db) = Map.lookup t db
-
-recipeFromKey :: Text.Text -> Db -> Maybe Recipe
-recipeFromKey t (getTable "recipes" -> Just (RecipeTable m)) = Map.lookup t m
-recipeFromKey _ _ = Nothing
-
-insertRecipe :: Text.Text -> Recipe -> Db -> Db
-insertRecipe k newRecipe (Db db) = Db $
-  Map.alter c "recipes" db
-  where c (Just (RecipeTable rt)) = Just $ RecipeTable $ Map.insert k newRecipe rt
-        c Nothing                 = Just $ RecipeTable $ Map.singleton k newRecipe
-        c (Just _)                = error "Something went terribly wrong."
 
 writeDb :: Db -> IO ()
 writeDb = encodeFile "db/db.json"

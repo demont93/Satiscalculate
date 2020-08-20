@@ -1,0 +1,548 @@
+{
+    "recipes": [
+        {
+            "factoryName": "Manufacturer",
+            "opm": 1,
+            "name": "Crystal Oscillator",
+            "craftingSeconds": 120,
+            "materialsNeeded": [
+                {
+                    "name": "Reinforced Iron Plate",
+                    "ipm": 2.5
+                },
+                {
+                    "name": "Quartz Crystal",
+                    "ipm": 18
+                },
+                {
+                    "name": "Cable",
+                    "ipm": 14
+                }
+            ]
+        },
+        {
+            "factoryName": "Constructor",
+            "opm": 10,
+            "name": "Copper Sheet",
+            "craftingSeconds": 6,
+            "materialsNeeded": [
+                {
+                    "name": "Copper Ingot",
+                    "ipm": 20
+                }
+            ]
+        },
+        {
+            "factoryName": "Assembler",
+            "opm": 10,
+            "name": "Heat Sink",
+            "craftingSeconds": 12,
+            "materialsNeeded": [
+                {
+                    "name": "Alclad Aluminum Sheet",
+                    "ipm": 40
+                },
+                {
+                    "name": "Rubber",
+                    "ipm": 70
+                }
+            ]
+        },
+        {
+            "factoryName": "Constructor",
+            "opm": 20,
+            "name": "Steel Pipe",
+            "craftingSeconds": 6,
+            "materialsNeeded": [
+                {
+                    "name": "Steel Ingot",
+                    "ipm": 30
+                }
+            ]
+        },
+        {
+            "factoryName": "Assembler",
+            "opm": 5,
+            "name": "Stator",
+            "craftingSeconds": 12,
+            "materialsNeeded": [
+                {
+                    "name": "Steel Pipe",
+                    "ipm": 15
+                },
+                {
+                    "name": "Wire",
+                    "ipm": 40
+                }
+            ]
+        },
+        {
+            "factoryName": "Manufacturer",
+            "opm": 2.5,
+            "name": "Computer",
+            "craftingSeconds": 24,
+            "materialsNeeded": [
+                {
+                    "name": "Plastic",
+                    "ipm": 45
+                },
+                {
+                    "name": "Screw",
+                    "ipm": 130
+                },
+                {
+                    "name": "Cable",
+                    "ipm": 22.5
+                },
+                {
+                    "name": "Circuit Board",
+                    "ipm": 25
+                }
+            ]
+        },
+        {
+            "factoryName": "Assembler",
+            "opm": 5,
+            "name": "Reinforced Iron Plate",
+            "craftingSeconds": 12,
+            "materialsNeeded": [
+                {
+                    "name": "Screw",
+                    "ipm": 60
+                },
+                {
+                    "name": "Iron Plate",
+                    "ipm": 30
+                }
+            ]
+        },
+        {
+            "factoryName": "Refinery",
+            "opm": 120,
+            "name": "Petroleum Coke",
+            "craftingSeconds": 6,
+            "materialsNeeded": [
+                {
+                    "name": "Heavy Oil Residue",
+                    "ipm": 40
+                }
+            ]
+        },
+        {
+            "factoryName": "Manufacturer",
+            "opm": 1,
+            "name": "Modular Engine",
+            "craftingSeconds": 60,
+            "materialsNeeded": [
+                {
+                    "name": "Motor",
+                    "ipm": 2
+                },
+                {
+                    "name": "Rubber",
+                    "ipm": 15
+                },
+                {
+                    "name": "Smart Plating",
+                    "ipm": 2
+                }
+            ]
+        },
+        {
+            "factoryName": "Assembler",
+            "opm": 30,
+            "name": "Alclad Aluminum Sheet",
+            "craftingSeconds": 8,
+            "materialsNeeded": [
+                {
+                    "name": "Copper Ingot",
+                    "ipm": 22.5
+                },
+                {
+                    "name": "Aluminum Ingot",
+                    "ipm": 60
+                }
+            ]
+        },
+        {
+            "factoryName": "Refinery",
+            "opm": 80,
+            "name": "Alumina Solution",
+            "craftingSeconds": 6,
+            "materialsNeeded": [
+                {
+                    "name": "Bauxite",
+                    "ipm": 70
+                },
+                {
+                    "name": "Water",
+                    "ipm": 100
+                }
+            ]
+        },
+        {
+            "factoryName": "Constructor",
+            "opm": 37.5,
+            "name": "Silica",
+            "craftingSeconds": 8,
+            "materialsNeeded": [
+                {
+                    "name": "Raw Quartz",
+                    "ipm": 22.5
+                }
+            ]
+        },
+        {
+            "factoryName": "Manufacturer",
+            "opm": 2.5,
+            "name": "Radio Control Unit",
+            "craftingSeconds": 24,
+            "materialsNeeded": [
+                {
+                    "name": "Crystal Oscillator",
+                    "ipm": 2.5
+                },
+                {
+                    "name": "Heat Sink",
+                    "ipm": 10
+                },
+                {
+                    "name": "Computer",
+                    "ipm": 2.5
+                },
+                {
+                    "name": "Rubber",
+                    "ipm": 40
+                }
+            ]
+        },
+        {
+            "factoryName": "Constructor",
+            "opm": 40,
+            "name": "Screw",
+            "craftingSeconds": 6,
+            "materialsNeeded": [
+                {
+                    "name": "Iron Rod",
+                    "ipm": 10
+                }
+            ]
+        },
+        {
+            "factoryName": "Foundry",
+            "opm": 45,
+            "name": "Steel Ingot",
+            "craftingSeconds": 4,
+            "materialsNeeded": [
+                {
+                    "name": "Coal",
+                    "ipm": 45
+                },
+                {
+                    "name": "Iron Ore",
+                    "ipm": 45
+                }
+            ]
+        },
+        {
+            "factoryName": "Assembler",
+            "opm": 5,
+            "name": "Versatile Framework",
+            "craftingSeconds": 24,
+            "materialsNeeded": [
+                {
+                    "name": "Modular Frame",
+                    "ipm": 2.5
+                },
+                {
+                    "name": "Steel Beam",
+                    "ipm": 30
+                }
+            ]
+        },
+        {
+            "factoryName": "Constructor",
+            "opm": 15,
+            "name": "Iron Rod",
+            "craftingSeconds": 4,
+            "materialsNeeded": [
+                {
+                    "name": "Iron Ingot",
+                    "ipm": 15
+                }
+            ]
+        },
+        {
+            "factoryName": "Assembler",
+            "opm": 5,
+            "name": "Motor",
+            "craftingSeconds": 12,
+            "materialsNeeded": [
+                {
+                    "name": "Stator",
+                    "ipm": 10
+                },
+                {
+                    "name": "Rotor",
+                    "ipm": 10
+                }
+            ]
+        },
+        {
+            "factoryName": "Constructor",
+            "opm": 22.5,
+            "name": "Quartz Crystal",
+            "craftingSeconds": 8,
+            "materialsNeeded": [
+                {
+                    "name": "Raw Quartz",
+                    "ipm": 37.5
+                }
+            ]
+        },
+        {
+            "factoryName": "Constructor",
+            "opm": 30,
+            "name": "Cable",
+            "craftingSeconds": 2,
+            "materialsNeeded": [
+                {
+                    "name": "Wire",
+                    "ipm": 60
+                }
+            ]
+        },
+        {
+            "factoryName": "Constructor",
+            "opm": 30,
+            "name": "Wire",
+            "craftingSeconds": 4,
+            "materialsNeeded": [
+                {
+                    "name": "Copper Ingot",
+                    "ipm": 15
+                }
+            ]
+        },
+        {
+            "factoryName": "Assembler",
+            "opm": 2,
+            "name": "Modular Frame",
+            "craftingSeconds": 60,
+            "materialsNeeded": [
+                {
+                    "name": "Reinforced Iron Plate",
+                    "ipm": 3
+                },
+                {
+                    "name": "Iron Rod",
+                    "ipm": 12
+                }
+            ]
+        },
+        {
+            "factoryName": "Assembler",
+            "opm": 10,
+            "name": "Encased Uranium Cell",
+            "craftingSeconds": 60,
+            "materialsNeeded": [
+                {
+                    "name": "Concrete",
+                    "ipm": 9
+                },
+                {
+                    "name": "Uranium Pellet",
+                    "ipm": 40
+                }
+            ]
+        },
+        {
+            "factoryName": "Assembler",
+            "opm": 4,
+            "name": "Rotor",
+            "craftingSeconds": 15,
+            "materialsNeeded": [
+                {
+                    "name": "Screw",
+                    "ipm": 100
+                },
+                {
+                    "name": "Iron Rod",
+                    "ipm": 20
+                }
+            ]
+        },
+        {
+            "factoryName": "Constructor",
+            "opm": 15,
+            "name": "Concrete",
+            "craftingSeconds": 4,
+            "materialsNeeded": [
+                {
+                    "name": "Limestone",
+                    "ipm": 45
+                }
+            ]
+        },
+        {
+            "factoryName": "Assembler",
+            "opm": 6,
+            "name": "Encased Industrial Beam",
+            "craftingSeconds": 10,
+            "materialsNeeded": [
+                {
+                    "name": "Concrete",
+                    "ipm": 30
+                },
+                {
+                    "name": "Steel Beam",
+                    "ipm": 24
+                }
+            ]
+        },
+        {
+            "factoryName": "Assembler",
+            "opm": 2.5,
+            "name": "Automated Wiring",
+            "craftingSeconds": 24,
+            "materialsNeeded": [
+                {
+                    "name": "Stator",
+                    "ipm": 2.5
+                },
+                {
+                    "name": "Cable",
+                    "ipm": 50
+                }
+            ]
+        },
+        {
+            "factoryName": "Refinery",
+            "opm": 50,
+            "name": "Uranium Pellet",
+            "craftingSeconds": 6,
+            "materialsNeeded": [
+                {
+                    "name": "Sulfuric Acid",
+                    "ipm": 80
+                },
+                {
+                    "name": "Uranium",
+                    "ipm": 50
+                }
+            ]
+        },
+        {
+            "factoryName": "Constructor",
+            "opm": 15,
+            "name": "Steel Beam",
+            "craftingSeconds": 4,
+            "materialsNeeded": [
+                {
+                    "name": "Steel Ingot",
+                    "ipm": 60
+                }
+            ]
+        },
+        {
+            "factoryName": "Smelter",
+            "opm": 30,
+            "name": "Copper Ingot",
+            "craftingSeconds": 2,
+            "materialsNeeded": [
+                {
+                    "name": "Copper Ore",
+                    "ipm": 30
+                }
+            ]
+        },
+        {
+            "factoryName": "Assembler",
+            "opm": 2,
+            "name": "Smart Plating",
+            "craftingSeconds": 30,
+            "materialsNeeded": [
+                {
+                    "name": "Reinforced Iron Plate",
+                    "ipm": 2
+                },
+                {
+                    "name": "Rotor",
+                    "ipm": 2
+                }
+            ]
+        },
+        {
+            "factoryName": "Constructor",
+            "opm": 20,
+            "name": "Iron Plate",
+            "craftingSeconds": 6,
+            "materialsNeeded": [
+                {
+                    "name": "Iron Ingot",
+                    "ipm": 30
+                }
+            ]
+        },
+        {
+            "factoryName": "Refinery",
+            "opm": 360,
+            "name": "Aluminum Scrap",
+            "craftingSeconds": 1,
+            "materialsNeeded": [
+                {
+                    "name": "Petroleum Coke",
+                    "ipm": 60
+                },
+                {
+                    "name": "Alumina Solution",
+                    "ipm": 240
+                }
+            ]
+        },
+        {
+            "factoryName": "Smelter",
+            "opm": 30,
+            "name": "Iron Ingot",
+            "craftingSeconds": 2,
+            "materialsNeeded": [
+                {
+                    "name": "Iron Ore",
+                    "ipm": 30
+                }
+            ]
+        },
+        {
+            "factoryName": "Foundry",
+            "opm": 80,
+            "name": "Aluminum Ingot",
+            "craftingSeconds": 3,
+            "materialsNeeded": [
+                {
+                    "name": "Silica",
+                    "ipm": 140
+                },
+                {
+                    "name": "Aluminum Scrap",
+                    "ipm": 240
+                }
+            ]
+        },
+        {
+            "factoryName": "Assembler",
+            "opm": 7.5,
+            "name": "Circuit Board",
+            "craftingSeconds": 8,
+            "materialsNeeded": [
+                {
+                    "name": "Copper Sheet",
+                    "ipm": 15
+                },
+                {
+                    "name": "Plastic",
+                    "ipm": 30
+                }
+            ]
+        }
+    ]
+}
